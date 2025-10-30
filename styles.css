@@ -1,0 +1,27 @@
+:root{
+  --border:#999; --text:#222; --bg:#fafafa; --panel:#fff; --accent:#2b6;
+}
+*{box-sizing:border-box}
+body{font-family:Segoe UI, Tahoma, Arial, sans-serif; color:var(--text); background:var(--bg); margin:24px}
+.window{background:var(--panel); border:3px solid #000; border-radius:8px; padding:20px; max-width:1100px; margin:0 auto}
+h1{font-size:20px; margin:0 0 12px 0}
+.topbar{display:flex; align-items:center; gap:12px; margin-bottom:16px}
+.tabs{display:flex; gap:8px}
+.tab{border:1px solid var(--border); background:#eee; padding:8px 12px; border-radius:4px; cursor:pointer}
+.tab.active{background:#ddd; font-weight:600}
+.spacer{flex:1}
+.logout{border:1px solid var(--border); padding:6px 10px; border-radius:4px; background:#eee; cursor:pointer}
+.row{display:flex; align-items:center; gap:10px; margin:10px 0}
+input[type=text], select{border:1px solid var(--border); padding:6px 8px; border-radius:3px; width:220px}
+button{border:1px solid var(--border); background:#eee; border-radius:3px; padding:6px 12px; cursor:pointer}
+button:disabled{opacity:.6; cursor:not-allowed}
+.card{border:1px solid #333; border-radius:4px; padding:10px; background:#fff}
+.card h3{margin:0; text-align:center; font-size:14px}
+table{border-collapse:collapse; width:100%; margin-top:6px}
+th,td{border:1px solid var(--border); padding:6px 8px; font-size:13px}
+th{background:#efefef}
+.notes{border:1px solid #ccd; background:#f7f7ff; padding:8px; font-size:12px}
+.statusbar{display:flex; gap:16px; border-top:2px solid #000; margin-top:12px; padding-top:8px; font-size:12px}
+.status-ok{color:var(--accent); font-weight:600}
+.right{margin-left:auto}
+.mt16{margin-top:16px}

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Modern Record-Keeping System — Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="window" id="app">
+    <h1>Modern Record-Keeping System — <span id="viewTitle">Dashboard</span></h1>
+
+    <div class="topbar">
+      <div class="tabs">
+        <button class="tab active" data-view="dashboard">Manage Records</button>
+        <button class="tab" data-view="reports">Reports</button>
+        <button class="tab" data-view="settings">Settings</button>
+        <button class="tab" data-view="help">Help</button>
+      </div>
+      <div class="spacer"></div>
+      <div>Welcome, [User]</div>
+      <button class="logout">Logout</button>
+    </div>
+
+    <!-- DASHBOARD (Recent Records) -->
+    <section id="dashboardView">
+      <div class="row">
+        <label>Search Records:</label>
+        <input type="text" id="dashSearch" placeholder="Enter Text">
+        <button id="dashSearchBtn">Search</button>
+      </div>
+
+      <div class="card">
+        <h3>Recent Records</h3>
+        <table id="recentTable">
+          <thead>
+            <tr><th>ID</th><th>Name</th><th>Department</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="4">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- MANAGE RECORDS -->
+    <section id="recordsView" style="display:none">
+      <div class="row">
+        <label>Search Records:</label>
+        <input type="text" id="searchText" placeholder="Enter Text">
+
+        <span class="right"></span>
+        <label>Filter by:</label>
+        <select id="deptFilter">
+          <option value="">Department</option>
+        </select>
+        <button id="searchBtn">Search</button>
+      </div>
+
+      <div class="card">
+        <h3>Records</h3>
+        <table id="recordsTable">
+          <thead>
+            <tr>
+              <th>Participant ID</th><th>Name</th><th>Employer</th><th>Status</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="5">Loading…</td></tr>
+          </tbody>
+        </table>
+
+        <div class="row mt16">
+          <button disabled>Add New Record</button>
+          <button disabled>Edit Record</button>
+          <button disabled>Archive</button>
+          <button disabled>Delete</button>
+        </div>
+      </div>
+
+      <div class="card mt16">
+        <h3>Transactions for Selected Record</h3>
+        <table id="txTable">
+          <thead>
+            <tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="4">Select a record to view its transactions.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Placeholders for other tabs -->
+    <section id="reportsView" style="display:none"><div class="notes">Reports placeholder.</div></section>
+    <section id="settingsView" style="display:none"><div class="notes">Settings placeholder.</div></section>
+    <section id="helpView" style="display:none"><div class="notes">Help placeholder.</div></section>
+
+    <div class="statusbar">
+      <div id="statusText">Status: Connecting…</div>
+      <div class="right">Role: Manager</div>
+    </div>
+  </div>
+
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
