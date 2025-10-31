@@ -25,3 +25,17 @@ th{background:#efefef}
 .status-ok{color:var(--accent); font-weight:600}
 .right{margin-left:auto}
 .mt16{margin-top:16px}
+
+/* selection highlight */
+#recordsTable tbody tr.selected{
+  outline:2px solid #3b82f6;
+  background:#f0f7ff;
+}
+
+/* dialog modal */
+dialog{border:1px solid var(--border); border-radius:8px; padding:16px 18px; max-width:520px}
+dialog::backdrop{background:rgba(0,0,0,.2)}
+.form .row{display:flex; gap:.75rem; align-items:center; margin:.5rem 0}
+.form label{width:120px; font-size:13px; color:#333}
+.form input, .form select{flex:1}
+.hint{font-size:12px; color:#666}
