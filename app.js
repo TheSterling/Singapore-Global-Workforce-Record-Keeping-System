@@ -15,37 +15,34 @@ const views = {
 const viewTitle = document.getElementById('viewTitle');
 const statusText = document.getElementById('statusText');
 
+// dashboard
 const recentTbody = document.querySelector('#recentTable tbody');
-const recordsTbody = document.querySelector('#recordsTable tbody');
-const txTbody = document.querySelector('#txTable tbody');
-
 const dashSearch = document.getElementById('dashSearch');
 const dashSearchBtn = document.getElementById('dashSearchBtn');
 
+// records
+const recordsTbody = document.querySelector('#recordsTable tbody');
+const txTbody = document.querySelector('#txTable tbody');
 const searchText = document.getElementById('searchText');
 const deptFilter = document.getElementById('deptFilter');
 const searchBtn = document.getElementById('searchBtn');
 
-// ---------- nav ----------
+// ---------- view switching ----------
 tabs.forEach(t => {
   t.addEventListener('click', () => {
     tabs.forEach(x => x.classList.remove('active'));
     t.classList.add('active');
 
-    const label = t.dataset.view;
-    if (label === 'dashboard') {
-      showView('records');
-      viewTitle.textContent = 'Manage Records';
-    } else {
-      showView(label);
-      viewTitle.textContent = 'Dashboard';
-    }
+    const v = t.dataset.view; // 'dashboard' | 'records' | 'reports' | 'settings' | 'help'
+    showView(v);
+    viewTitle.textContent = v === 'records' ? 'Manage Records'
+                      : v.charAt(0).toUpperCase() + v.slice(1);
   });
 });
 
 function showView(name){
   Object.values(views).forEach(v => v.style.display = 'none');
-  (name === 'records' ? views.records : views[name]).style.display = 'block';
+  views[name].style.display = 'block';
 }
 
 // ---------- helpers ----------
@@ -73,7 +70,11 @@ async function loadRecent(){
     .select('participant_id,name,department,status,updated_at')
     .order('updated_at', { ascending:false })
     .limit(3);
-  if (error){ recentTbody.innerHTML = `<tr><td colspan="4">${error.message}</td></tr>`; return; }
+
+  if (error){
+    recentTbody.innerHTML = `<tr><td colspan="4">${error.message}</td></tr>`;
+    return;
+  }
 
   const rows = data.map(p => {
     const tr = document.createElement('tr');
@@ -89,7 +90,11 @@ async function loadRecent(){
 
 // ---------- manage records ----------
 async function populateDeptFilter(){
-  const { data } = await supabase.from('participants').select('department').not('department','is',null);
+  const { data } = await supabase
+    .from('participants')
+    .select('department')
+    .not('department','is',null);
+
   const unique = [...new Set((data||[]).map(d => d.department).filter(Boolean))].sort();
   deptFilter.innerHTML = `<option value="">Department</option>` + unique.map(d=>`<option>${d}</option>`).join('');
 }
@@ -102,11 +107,18 @@ async function loadRecords(){
     .select('participant_id,name,employer,status,department')
     .order('participant_id', { ascending:true });
 
-  if (q) query = query.or(`name.ilike.%${q}%,employer.ilike.%${q}%`);
-  if (dept) query = query.eq('department', dept);
+  if (q){
+    query = query.or(`name.ilike.%${q}%,employer.ilike.%${q}%`);
+  }
+  if (dept){
+    query = query.eq('department', dept);
+  }
 
   const { data, error } = await query;
-  if (error){ recordsTbody.innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`; return; }
+  if (error){
+    recordsTbody.innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
+    return;
+  }
 
   const rows = data.map(p => {
     const tr = document.createElement('tr');
@@ -133,7 +145,10 @@ async function loadTransactions(participantId){
     .order('tx_date', { ascending:false })
     .limit(3);
 
-  if (error){ txTbody.innerHTML = `<tr><td colspan="4">${error.message}</td></tr>`; return; }
+  if (error){
+    txTbody.innerHTML = `<tr><td colspan="4">${error.message}</td></tr>`;
+    return;
+  }
 
   const rows = data.map(t => {
     const tr = document.createElement('tr');
@@ -147,9 +162,10 @@ async function loadTransactions(participantId){
   renderRows(txTbody, rows, 4);
 }
 
-// ---------- search wiring ----------
-dashSearchBtn.onclick = async () => {
-  document.querySelector('.tab[data-view="dashboard"]').click();
+// ---------- search binding ----------
+document.getElementById('dashSearchBtn').onclick = async () => {
+  // When searching from Dashboard, jump to Manage Records with the query applied
+  document.querySelector('.tab[data-view="records"]').click();
   searchText.value = dashSearch.value;
   await loadRecords();
 };
@@ -160,9 +176,13 @@ deptFilter.onchange = loadRecords;
 (async function init(){
   const { error } = await supabase.from('participants').select('participant_id').limit(1);
   setConnected(!error);
+
   await loadRecent();
   await populateDeptFilter();
   await loadRecords();
-  showView('records'); 
-  viewTitle.textContent = 'Manage Records';
+
+  showView('dashboard');
+  viewTitle.textContent = 'Dashboard';
+  tabs.forEach(x => x.classList.remove('active'));
+  document.querySelector('.tab[data-view="dashboard"]').classList.add('active');
 })();
