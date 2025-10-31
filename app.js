@@ -121,7 +121,7 @@ function bindRowSelection(){
       tr.classList.add('selected');
       selectedId = tr.dataset.id;
       editBtn.disabled = false;
-      deleteBtn.disabled = true;
+      deleteBtn.disabled = false;
       archiveBtn.disabled = false;
       loadTransactions(selectedId);
     });
@@ -320,6 +320,7 @@ if (deptFilter)  deptFilter.onchange = loadRecords;
   tabs.forEach(t => t.classList.remove('active'));
   document.querySelector('.tab[data-target="#dashboardView"]').classList.add('active');
 })();
+
 
 
 
