@@ -29,8 +29,23 @@ const deptFilter   = document.getElementById('deptFilter');
 const searchBtn    = document.getElementById('searchBtn');
 
 // ----- view switching (robust) -----
-function showOnly(targetSelector){
-  sections.forEach(sec => sec.style.display = (('#'+sec.id) === targetSelector) ? 'block' : 'none');
+function getAllViews() {
+  // collect any section with id ending in "View" (dashboardView, recordsView, etc.)
+  return Array.from(document.querySelectorAll('section[id$="View"]'));
+}
+
+function showOnly(targetSelector) {
+  const target = document.querySelector(targetSelector);
+  const all = getAllViews();
+
+  // Hide everything that exists
+  all.forEach(sec => { sec.style.display = 'none'; });
+
+  if (!target) {
+    console.warn('View not found:', targetSelector);
+    return; // don't crash if a section is missing
+  }
+  target.style.display = 'block';
 }
 
 tabs.forEach(btn => {
@@ -38,12 +53,11 @@ tabs.forEach(btn => {
     tabs.forEach(t => t.classList.remove('active'));
     btn.classList.add('active');
 
-    const target = btn.getAttribute('data-target');   // e.g. "#dashboardView"
+    const target = btn.getAttribute('data-target');   // e.g. "#recordsView"
     showOnly(target);
 
     // Title = button text
-    const label = btn.textContent.trim();
-    viewTitle.textContent = label;
+    viewTitle.textContent = btn.textContent.trim();
   });
 });
 
@@ -172,18 +186,28 @@ searchBtn.onclick = loadRecords;
 deptFilter.onchange = loadRecords;
 
 // ----- init -----
-(async function init(){
-  // connection probe
+(async function init () {
+  // 1) Connectivity probe
   const { error } = await supabase.from('participants').select('participant_id').limit(1);
   setConnected(!error);
 
-  await loadRecent();
-  await populateDeptFilter();
-  await loadRecords();
+  // 2) Load dashboard widgets (only if the table exists)
+  if (document.querySelector('#recentTable tbody')) {
+    await loadRecent();
+  }
 
-  // Start on Dashboard for real
+  // 3) Preload Manage Records (only if those controls exist)
+  if (document.getElementById('deptFilter')) {
+    await populateDeptFilter();
+  }
+  if (document.querySelector('#recordsTable tbody')) {
+    await loadRecords();
+  }
+
+  // 4) Start on Dashboard
   showOnly('#dashboardView');
   viewTitle.textContent = 'Dashboard';
   tabs.forEach(t => t.classList.remove('active'));
   document.querySelector('.tab[data-target="#dashboardView"]').classList.add('active');
 })();
+
