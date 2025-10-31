@@ -113,7 +113,6 @@ async function populateDeptFilter(){
   deptFilter.innerHTML = `<option value="">Department</option>` + unique.map(d=>`<option>${d}</option>`).join('');
 }
 
-// selection helper: adds click to each row
 function bindRowSelection(){
   document.querySelectorAll('#recordsTable tbody tr').forEach(tr => {
     if (!tr.dataset.id) return;
@@ -265,7 +264,6 @@ async function deleteSelected(){
   if (!sure) return;
 
   try{
-    // ensure child rows are gone if FK doesn’t cascade
     await supabase.from('transactions').delete().eq('participant_id', selectedId);
 
     const { error } = await supabase
@@ -322,5 +320,6 @@ if (deptFilter)  deptFilter.onchange = loadRecords;
   tabs.forEach(t => t.classList.remove('active'));
   document.querySelector('.tab[data-target="#dashboardView"]').classList.add('active');
 })();
+
 
 
