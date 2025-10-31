@@ -3,49 +3,51 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ---------- elements ----------
+// ----- elements -----
 const tabs = document.querySelectorAll('.tab');
-const views = {
-  dashboard: document.getElementById('dashboardView'),
-  records: document.getElementById('recordsView'),
-  reports: document.getElementById('reportsView'),
-  settings: document.getElementById('settingsView'),
-  help: document.getElementById('helpView'),
-};
+const sections = [
+  '#dashboardView',
+  '#recordsView',
+  '#reportsView',
+  '#settingsView',
+  '#helpView'
+].map(sel => document.querySelector(sel));
+
 const viewTitle = document.getElementById('viewTitle');
 const statusText = document.getElementById('statusText');
 
 // dashboard
-const recentTbody = document.querySelector('#recentTable tbody');
-const dashSearch = document.getElementById('dashSearch');
+const recentTbody   = document.querySelector('#recentTable tbody');
+const dashSearch    = document.getElementById('dashSearch');
 const dashSearchBtn = document.getElementById('dashSearchBtn');
 
 // records
 const recordsTbody = document.querySelector('#recordsTable tbody');
-const txTbody = document.querySelector('#txTable tbody');
-const searchText = document.getElementById('searchText');
-const deptFilter = document.getElementById('deptFilter');
-const searchBtn = document.getElementById('searchBtn');
+const txTbody      = document.querySelector('#txTable tbody');
+const searchText   = document.getElementById('searchText');
+const deptFilter   = document.getElementById('deptFilter');
+const searchBtn    = document.getElementById('searchBtn');
 
-// ---------- view switching ----------
-tabs.forEach(t => {
-  t.addEventListener('click', () => {
-    tabs.forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
+// ----- view switching (robust) -----
+function showOnly(targetSelector){
+  sections.forEach(sec => sec.style.display = (('#'+sec.id) === targetSelector) ? 'block' : 'none');
+}
 
-    const v = t.dataset.view; // 'dashboard' | 'records' | 'reports' | 'settings' | 'help'
-    showView(v);
-    viewTitle.textContent = v === 'records' ? 'Manage Records'
-                      : v.charAt(0).toUpperCase() + v.slice(1);
+tabs.forEach(btn => {
+  btn.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+
+    const target = btn.getAttribute('data-target');   // e.g. "#dashboardView"
+    showOnly(target);
+
+    // Title = button text
+    const label = btn.textContent.trim();
+    viewTitle.textContent = label;
   });
 });
 
-function showView(name){
-  Object.values(views).forEach(v => v.style.display = 'none');
-  views[name].style.display = 'block';
-}
-
-// ---------- helpers ----------
+// ----- helpers -----
 function setConnected(ok){
   statusText.innerHTML = ok
     ? 'Status: <span class="status-ok">Connected to SGW Records Database (PostgreSQL)</span>'
@@ -63,7 +65,7 @@ function renderRows(tbody, rows, cols){
   rows.forEach(r => tbody.appendChild(r));
 }
 
-// ---------- dashboard (recent) ----------
+// ----- dashboard (recent) -----
 async function loadRecent(){
   const { data, error } = await supabase
     .from('participants')
@@ -88,7 +90,7 @@ async function loadRecent(){
   renderRows(recentTbody, rows, 4);
 }
 
-// ---------- manage records ----------
+// ----- records list / transactions -----
 async function populateDeptFilter(){
   const { data } = await supabase
     .from('participants')
@@ -107,12 +109,8 @@ async function loadRecords(){
     .select('participant_id,name,employer,status,department')
     .order('participant_id', { ascending:true });
 
-  if (q){
-    query = query.or(`name.ilike.%${q}%,employer.ilike.%${q}%`);
-  }
-  if (dept){
-    query = query.eq('department', dept);
-  }
+  if (q)   query = query.or(`name.ilike.%${q}%,employer.ilike.%${q}%`);
+  if (dept) query = query.eq('department', dept);
 
   const { data, error } = await query;
   if (error){
@@ -162,18 +160,20 @@ async function loadTransactions(participantId){
   renderRows(txTbody, rows, 4);
 }
 
-// ---------- search binding ----------
-document.getElementById('dashSearchBtn').onclick = async () => {
-  // When searching from Dashboard, jump to Manage Records with the query applied
-  document.querySelector('.tab[data-view="records"]').click();
+// ----- search wiring -----
+dashSearchBtn.onclick = async () => {
+  // Jump to Manage Records with the query applied
+  const manageBtn = document.querySelector('.tab[data-target="#recordsView"]');
+  manageBtn.click();
   searchText.value = dashSearch.value;
   await loadRecords();
 };
 searchBtn.onclick = loadRecords;
 deptFilter.onchange = loadRecords;
 
-// ---------- init ----------
+// ----- init -----
 (async function init(){
+  // connection probe
   const { error } = await supabase.from('participants').select('participant_id').limit(1);
   setConnected(!error);
 
@@ -181,8 +181,9 @@ deptFilter.onchange = loadRecords;
   await populateDeptFilter();
   await loadRecords();
 
-  showView('dashboard');
+  // Start on Dashboard for real
+  showOnly('#dashboardView');
   viewTitle.textContent = 'Dashboard';
-  tabs.forEach(x => x.classList.remove('active'));
-  document.querySelector('.tab[data-view="dashboard"]').classList.add('active');
+  tabs.forEach(t => t.classList.remove('active'));
+  document.querySelector('.tab[data-target="#dashboardView"]').classList.add('active');
 })();
