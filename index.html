@@ -10,9 +10,11 @@
   <div class="window" id="app">
     <h1>Modern Record-Keeping System — <span id="viewTitle">Dashboard</span></h1>
 
+    <!-- Top nav -->
     <div class="topbar">
       <div class="tabs">
-        <button class="tab active" data-view="dashboard">Manage Records</button>
+        <button class="tab active" data-view="dashboard">Dashboard</button>
+        <button class="tab" data-view="records">Manage Records</button>
         <button class="tab" data-view="reports">Reports</button>
         <button class="tab" data-view="settings">Settings</button>
         <button class="tab" data-view="help">Help</button>
@@ -22,7 +24,7 @@
       <button class="logout">Logout</button>
     </div>
 
-    <!-- DASHBOARD (Recent Records) -->
+    <!-- DASHBOARD -->
     <section id="dashboardView">
       <div class="row">
         <label>Search Records:</label>
@@ -36,7 +38,7 @@
           <thead>
             <tr><th>ID</th><th>Name</th><th>Department</th><th>Status</th></tr>
           </thead>
-          <tbody>
+        <tbody>
             <tr><td colspan="4">Loading…</td></tr>
           </tbody>
         </table>
@@ -91,18 +93,19 @@
       </div>
     </section>
 
-    <!-- Placeholders for other tabs -->
+    <!-- Placeholders -->
     <section id="reportsView" style="display:none"><div class="notes">Reports placeholder.</div></section>
     <section id="settingsView" style="display:none"><div class="notes">Settings placeholder.</div></section>
     <section id="helpView" style="display:none"><div class="notes">Help placeholder.</div></section>
 
+    <!-- Status bar -->
     <div class="statusbar">
       <div id="statusText">Status: Connecting…</div>
       <div class="right">Role: Manager</div>
     </div>
   </div>
 
-
+  <!-- App -->
   <script type="module" src="app.js"></script>
 </body>
 </html>
